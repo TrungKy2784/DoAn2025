@@ -1,184 +1,127 @@
-import React from 'react';
-import {Link} from "react-router-dom";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../../services/api'; // Đường dẫn tới file api.js
 
-function SignIn(){
+function SignIn() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+
+    const handleLogin = async () => {
+        try {
+            // Bước 1: Gọi csrf-cookie trước
+            await api.get('/sanctum/csrf-cookie');
+
+            // Bước 2: Gửi login sau khi có CSRF cookie
+            const response = await api.post('/api/login', {
+                email: username,
+                password,
+            });
+
+            alert('Đăng nhập thành công!');
+            localStorage.setItem('token', response.token); // Hoặc lưu như bạn muốn
+            navigate('/dashboard');
+        } catch (error) {
+            console.error('Đăng nhập thất bại:', error);
+            alert('Sai thông tin đăng nhập hoặc lỗi kết nối.');
+        }
+    };
+
+
     return (
-        <body
-            className="m-0 font-sans antialiased font-normal bg-white text-start text-base leading-default text-slate-500">
-        <div className="container sticky top-0 z-sticky">
-            <div className="flex flex-wrap -mx-3">
-                <div className="w-full max-w-full px-3 flex-0">
-                    {/*// <!-- Navbar -->*/}
-                    <nav
-                        className="absolute top-0 left-0 right-0 z-30 flex flex-wrap items-center px-4 py-2 m-6 mb-0 shadow-sm rounded-xl bg-white/80 backdrop-blur-2xl backdrop-saturate-200 lg:flex-nowrap lg:justify-start">
-                        <div className="flex items-center justify-between w-full p-0 px-6 mx-auto flex-wrap-inherit">
-                            <a className="py-1.75 text-sm mr-4 ml-4 whitespace-nowrap font-bold text-slate-700 lg:ml-0"
-                               href="https://demos.creative-tim.com/argon-dashboard-tailwind/pages/dashboard.html"
-                               target="_blank"> Argon Dashboard 2 </a>
-                            <button navbar-trigger
-                                    className="px-3 py-1 ml-2 leading-none transition-all ease-in-out bg-transparent border border-transparent border-solid rounded-lg shadow-none cursor-pointer text-lg lg:hidden"
-                                    type="button" aria-controls="navigation" aria-expanded="false"
-                                    aria-label="Toggle navigation">
-                <span className="inline-block mt-2 align-middle bg-center bg-no-repeat bg-cover w-6 h-6 bg-none">
-                  <span bar1
-                        className="w-5.5 rounded-xs relative my-0 mx-auto block h-px bg-gray-600 transition-all duration-300"></span>
-                  <span bar2
-                        className="w-5.5 rounded-xs mt-1.75 relative my-0 mx-auto block h-px bg-gray-600 transition-all duration-300"></span>
-                  <span bar3
-                        className="w-5.5 rounded-xs mt-1.75 relative my-0 mx-auto block h-px bg-gray-600 transition-all duration-300"></span>
-                </span>
-                            </button>
-                            <div navbar-menu
-                                 className="items-center flex-grow transition-all duration-500 lg-max:overflow-hidden ease lg-max:max-h-0 basis-full lg:flex lg:basis-auto">
-                                <ul className="flex flex-col pl-0 mx-auto mb-0 list-none lg:flex-row xl:ml-auto">
-                                    <li>
-                                        <Link className="flex items-center px-4 py-2 mr-2 font-normal  transition-all ease-in-out duration-250 lg-max:opacity-0 lg-max:text-slate-700 text-sm lg:px-2 lg:hover:text-black/75"
-                                              aria-current="page" to="/dashboard">
-                                            <i className="mr-1  lg-max:text-slate-700 fa fa-chart-pie opacity-60"></i>
-                                            Dashboard
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <a className="block px-4 py-2 mr-2 font-normal transition-all ease-in-out lg-max:opacity-0 duration-250 text-sm text-slate-700 lg:px-2"
-                                           href="../pages/profile.html">
-                                            <i className="mr-1 fa fa-user opacity-60"></i>
-                                            Profile
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <Link className="block px-4 py-2 mr-2 font-normal transition-all ease-in-out lg-max:opacity-0 duration-250 text-sm text-slate-700 lg:px-2"
-                                           to="/signup">
-                                            <i className="mr-1 fas fa-user-circle opacity-60"></i>
-                                            Sign Up
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <a className="block px-4 py-2 mr-2 font-normal transition-all ease-in-out lg-max:opacity-0 duration-250 text-sm text-slate-700 lg:px-2"
-                                           href="../pages/sign-in.html">
-                                            <i className="mr-1 fas fa-key opacity-60"></i>
-                                            Sign In
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </nav>
-                </div>
+        <div className="m-0 font-sans antialiased font-normal bg-white text-start text-base leading-default text-slate-500">
+            {/* Navbar */}
+            <div className="container sticky top-0 z-sticky">
+                <nav className="absolute top-0 left-0 right-0 z-30 flex flex-wrap items-center px-4 py-2 m-6 mb-0 shadow-sm rounded-xl bg-white/80 backdrop-blur-2xl backdrop-saturate-200">
+                    <div className="flex items-center justify-between w-full p-0 px-6 mx-auto flex-wrap-inherit">
+                        <a className="py-1.75 text-sm mr-4 ml-4 whitespace-nowrap font-bold text-slate-700" href="#">Argon Dashboard 2</a>
+                        <ul className="flex flex-col pl-0 mx-auto mb-0 list-none lg:flex-row xl:ml-auto">
+                            <li>
+                                <Link className="flex items-center px-4 py-2 mr-2 font-normal text-sm text-slate-700" to="/dashboard">
+                                    <i className="mr-1 fa fa-chart-pie opacity-60"></i>
+                                    Dashboard
+                                </Link>
+                            </li>
+                            <li>
+                                <Link className="block px-4 py-2 mr-2 font-normal text-sm text-slate-700" to="/signup">
+                                    <i className="mr-1 fas fa-user-circle opacity-60"></i>
+                                    Sign Up
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
             </div>
-        </div>
-        <main className="mt-0 transition-all duration-200 ease-in-out">
-            <section>
-                <div className="relative flex items-center min-h-screen p-0 overflow-hidden bg-center bg-cover">
-                    <div className="container z-1">
-                        <div className="flex flex-wrap -mx-3">
-                            <div
-                                className="flex flex-col w-full max-w-full px-3 mx-auto lg:mx-0 shrink-0 md:flex-0 md:w-7/12 lg:w-5/12 xl:w-4/12">
-                                <div
-                                    className="relative flex flex-col min-w-0 break-words bg-transparent border-0 shadow-none lg:py4 dark:bg-gray-950 rounded-2xl bg-clip-border">
-                                    <div className="p-6 pb-0 mb-0">
+
+            {/* Main content */}
+            <main className="mt-0 transition-all duration-200 ease-in-out">
+                <section>
+                    <div className="relative flex items-center min-h-screen p-0 overflow-hidden bg-center bg-cover">
+                        <div className="container z-1">
+                            <div className="flex flex-wrap -mx-3">
+                                <div className="flex flex-col w-full max-w-full px-3 mx-auto md:w-7/12 lg:w-5/12 xl:w-4/12">
+                                    <div className="relative flex flex-col min-w-0 bg-white border-0 shadow-md rounded-2xl p-6">
                                         <h4 className="font-bold">Sign In</h4>
-                                        <p className="mb-0">Enter your email and password to sign in</p>
-                                    </div>
-                                    <div className="flex-auto p-6">
-                                        <form role="form">
+                                        <p className="mb-4">Enter your username and password to sign in</p>
+
+                                        <form>
                                             <div className="mb-4">
-                                                <input type="email" placeholder="Email"
-                                                       className="focus:shadow-primary-outline dark:bg-gray-950 dark:placeholder:text-white/80 dark:text-white/80 text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-fuchsia-300 focus:outline-none"/>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Username"
+                                                    value={username}
+                                                    onChange={(e) => setUsername(e.target.value)}
+                                                    className="text-sm block w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-700 placeholder:text-gray-500 focus:border-fuchsia-300 focus:outline-none"
+                                                />
                                             </div>
                                             <div className="mb-4">
-                                                <input type="password" placeholder="Password"
-                                                       className="focus:shadow-primary-outline dark:bg-gray-950 dark:placeholder:text-white/80 dark:text-white/80 text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-fuchsia-300 focus:outline-none"/>
-                                            </div>
-                                            <div className="flex items-center pl-12 mb-0.5 text-left min-h-6">
-                                                <input id="rememberMe"
-                                                       className="mt-0.5 rounded-10 duration-250 ease-in-out after:rounded-circle after:shadow-2xl after:duration-250 checked:after:translate-x-5.3 h-5 relative float-left -ml-12 w-10 cursor-pointer appearance-none border border-solid border-gray-200 bg-zinc-700/10 bg-none bg-contain bg-left bg-no-repeat align-top transition-all after:absolute after:top-px after:h-4 after:w-4 after:translate-x-px after:bg-white after:content-[''] checked:border-blue-500/95 checked:bg-blue-500/95 checked:bg-none checked:bg-right"
-                                                       type="checkbox"/>
-                                                <label
-                                                    className="ml-2 font-normal cursor-pointer select-none text-sm text-slate-700"
-                                                    htmlFor="rememberMe">Remember me</label>
+                                                <input
+                                                    type="password"
+                                                    placeholder="Password"
+                                                    value={password}
+                                                    onChange={(e) => setPassword(e.target.value)}
+                                                    className="text-sm block w-full rounded-lg border border-gray-300 bg-white p-3 text-gray-700 placeholder:text-gray-500 focus:border-fuchsia-300 focus:outline-none"
+                                                />
                                             </div>
                                             <div className="text-center">
-                                                <button type="button"
-                                                        className="inline-block w-full px-16 py-3.5 mt-6 mb-0 font-bold leading-normal text-center text-white align-middle transition-all bg-blue-500 border-0 rounded-lg cursor-pointer hover:-translate-y-px active:opacity-85 hover:shadow-xs text-sm ease-in tracking-tight-rem shadow-md bg-150 bg-x-25">Sign
-                                                    in
+                                                <button
+                                                    type="button"
+                                                    onClick={handleLogin}
+                                                    className="w-full px-6 py-3 mt-4 font-bold text-white bg-blue-500 rounded-lg shadow-md hover:-translate-y-px transition-all"
+                                                >
+                                                    Sign in
                                                 </button>
                                             </div>
                                         </form>
-                                    </div>
-                                    <div
-                                        className="border-black/12.5 rounded-b-2xl border-t-0 border-solid p-6 text-center pt-0 px-1 sm:px-6">
-                                        <p className="mx-auto mb-6 leading-normal text-sm">Don't have an account? <a
-                                            href="../pages/sign-up.html"
-                                            className="font-semibold text-transparent bg-clip-text bg-gradient-to-tl from-blue-500 to-violet-500">Sign
-                                            up</a></p>
+
+                                        <div className="mt-6 text-center">
+                                            <p className="text-sm">
+                                                Don't have an account?
+                                                <Link to="/signup" className="ml-1 font-semibold text-blue-600">
+                                                    Sign up
+                                                </Link>
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div
-                                className="absolute top-0 right-0 flex-col justify-center hidden w-6/12 h-full max-w-full px-3 pr-0 my-auto text-center flex-0 lg:flex">
-                                <div
-                                    className="relative flex flex-col justify-center h-full bg-cover px-24 m-4 overflow-hidden bg-[url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signin-ill.jpg')] rounded-xl ">
-                                    <span
-                                        className="absolute top-0 left-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-blue-500 to-violet-500 opacity-60"></span>
-                                    <h4 className="z-20 mt-12 font-bold text-white">"Attention is the new currency"</h4>
-                                    <p className="z-20 text-white ">The more effortless the writing looks, the more
-                                        effort the writer actually put into the process.</p>
+
+                                {/* Image side */}
+                                <div className="hidden lg:flex w-6/12 h-full pr-0">
+                                    <div className="relative flex flex-col justify-center h-full bg-cover px-24 m-4 rounded-xl bg-[url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signin-ill.jpg')]">
+                                        <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-tl from-blue-500 to-violet-500 opacity-60"></span>
+                                        <h4 className="z-10 mt-12 font-bold text-white relative">"Attention is the new currency"</h4>
+                                        <p className="z-10 text-white relative">
+                                            The more effortless the writing looks, the more effort the writer actually put into the process.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-        </main>
-        <footer className="py-12">
-            <div className="container">
-                <div className="flex flex-wrap -mx-3">
-                    <div className="flex-shrink-0 w-full max-w-full mx-auto mb-6 text-center lg:flex-0 lg:w-8/12">
-                        <a href="javascript:;" target="_blank"
-                           className="mb-2 mr-4 text-slate-400 sm:mb-0 xl:mr-12"> Company </a>
-                        <a href="javascript:;" target="_blank"
-                           className="mb-2 mr-4 text-slate-400 sm:mb-0 xl:mr-12"> About Us </a>
-                        <a href="javascript:;" target="_blank"
-                           className="mb-2 mr-4 text-slate-400 sm:mb-0 xl:mr-12"> Team </a>
-                        <a href="javascript:;" target="_blank"
-                           className="mb-2 mr-4 text-slate-400 sm:mb-0 xl:mr-12"> Products </a>
-                        <a href="javascript:;" target="_blank"
-                           className="mb-2 mr-4 text-slate-400 sm:mb-0 xl:mr-12"> Blog </a>
-                        <a href="javascript:;" target="_blank"
-                           className="mb-2 mr-4 text-slate-400 sm:mb-0 xl:mr-12"> Pricing </a>
-                    </div>
-                    <div className="flex-shrink-0 w-full max-w-full mx-auto mt-2 mb-6 text-center lg:flex-0 lg:w-8/12">
-                        <a href="javascript:;" target="_blank" className="mr-6 text-slate-400">
-                            <span className="text-lg fab fa-dribbble"></span>
-                        </a>
-                        <a href="javascript:;" target="_blank" className="mr-6 text-slate-400">
-                            <span className="text-lg fab fa-twitter"></span>
-                        </a>
-                        <a href="javascript:;" target="_blank" className="mr-6 text-slate-400">
-                            <span className="text-lg fab fa-instagram"></span>
-                        </a>
-                        <a href="javascript:;" target="_blank" className="mr-6 text-slate-400">
-                            <span className="text-lg fab fa-pinterest"></span>
-                        </a>
-                        <a href="javascript:;" target="_blank" className="mr-6 text-slate-400">
-                            <span className="text-lg fab fa-github"></span>
-                        </a>
-                    </div>
-                </div>
-                <div className="flex flex-wrap -mx-3">
-                    <div className="w-8/12 max-w-full px-3 mx-auto mt-1 text-center flex-0">
-                        <p className="mb-0 text-slate-400">
-                            Copyright ©
-                            <script>
-                                document.write(new Date().getFullYear());
-                            </script>
-                            Argon Dashboard 2 by Creative Tim.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </footer>
-        </body>
+                </section>
+            </main>
+        </div>
     );
 }
+
 export default SignIn;
